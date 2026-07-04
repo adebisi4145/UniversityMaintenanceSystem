@@ -1,0 +1,27 @@
+# ---- .NET ----
+bin/
+obj/
+*.user
+.vs/
+[Dd]ebug/
+[Rr]elease/
+*.suo
+
+# ---- Uploaded evidence files ----
+UniversityMaintenance.API/wwwroot/uploads/
+
+# ---- Local secrets / env ----
+appsettings.*.Local.json
+*.local.env
+.env
+
+# ---- Node / frontend ----
+node_modules/
+dist/
+UniversityMaintenance.Web/node_modules/
+UniversityMaintenance.Web/dist/
+*.log
+
+# ---- OS ----
+.DS_Store
+Thumbs.db

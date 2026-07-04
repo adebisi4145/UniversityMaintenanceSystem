@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="UniversityMaintenance.API/UniversityMaintenance.API.csproj" />
+  <Project Path="UniversityMaintenance.Application/UniversityMaintenance.Application.csproj" />
+  <Project Path="UniversityMaintenance.Domain/UniversityMaintenance.Domain.csproj" />
+  <Project Path="UniversityMaintenance.Infrastructure/UniversityMaintenance.Infrastructure.csproj" />
+  <Project Path="UniversityMaintenance.Tests/UniversityMaintenance.Tests.csproj" />
+</Solution>

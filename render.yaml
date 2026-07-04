@@ -1,0 +1,28 @@
+# Render Blueprint — deploys the API as a Docker web service.
+# The PostgreSQL database is provisioned separately (Neon free tier or Render Postgres).
+services:
+  - type: web
+    name: university-maintenance-api
+    runtime: docker
+    dockerfilePath: ./UniversityMaintenance.API/Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /swagger/v1/swagger.json
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      # Set these in the Render dashboard (mark secrets as such):
+      - key: ConnectionStrings__DefaultConnection
+        sync: false # e.g. Host=...neon.tech;Database=...;Username=...;Password=...;SSL Mode=Require;Trust Server Certificate=true
+      - key: Jwt__Key
+        sync: false # a long random secret (>= 32 chars)
+      - key: Jwt__Issuer
+        value: UniversityMaintenance
+      - key: Jwt__Audience
+        value: UniversityMaintenanceClient
+      - key: Cors__AllowedOrigins__0
+        sync: false # the deployed frontend origin, e.g. https://your-app.vercel.app
+      - key: Seed__AdminEmail
+        sync: false
+      - key: Seed__AdminPassword
+        sync: false

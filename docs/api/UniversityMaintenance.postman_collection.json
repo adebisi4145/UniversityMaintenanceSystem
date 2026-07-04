@@ -1,0 +1,225 @@
+{
+  "info": {
+    "name": "University Maintenance System API",
+    "description": "REST API for submitting, assigning and tracking maintenance service requests. Run 'Auth > Login' first to capture the JWT into the {{token}} variable.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5071" },
+    { "key": "token", "value": "" },
+    { "key": "requestId", "value": "" },
+    { "key": "officerId", "value": "" },
+    { "key": "categoryId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Doe\",\n  \"email\": \"jane@student.edu\",\n  \"password\": \"Pass@123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set('token', data.token);",
+                  "pm.test('token received', () => pm.expect(data.token).to.be.a('string'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@university.edu\",\n  \"password\": \"Admin@123\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Service Requests",
+      "item": [
+        {
+          "name": "List (search/filter/paginate)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/service-requests?search=&status=&categoryId=&page=1&pageSize=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "service-requests"],
+              "query": [
+                { "key": "search", "value": "" },
+                { "key": "status", "value": "" },
+                { "key": "categoryId", "value": "" },
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create (multipart, with evidence)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) pm.collectionVariables.set('requestId', pm.response.json().id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/service-requests",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "Title", "value": "Broken socket in Room 12", "type": "text" },
+                { "key": "Description", "value": "The wall socket sparks.", "type": "text" },
+                { "key": "Location", "value": "Block A, Room 12", "type": "text" },
+                { "key": "Priority", "value": "2", "type": "text" },
+                { "key": "CategoryId", "value": "{{categoryId}}", "type": "text" },
+                { "key": "evidence", "type": "file", "src": [] }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get by id",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/service-requests/{{requestId}}" }
+        },
+        {
+          "name": "Status history (audit trail)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/service-requests/{{requestId}}/history" }
+        },
+        {
+          "name": "Update status",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/service-requests/{{requestId}}/status",
+            "body": { "mode": "raw", "raw": "{\n  \"status\": 2,\n  \"comment\": \"Work started\"\n}" }
+          }
+        },
+        {
+          "name": "Delete",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/api/service-requests/{{requestId}}" }
+        }
+      ]
+    },
+    {
+      "name": "Assignments",
+      "item": [
+        {
+          "name": "Assign request to officer (admin)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/assignments",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"serviceRequestId\": \"{{requestId}}\",\n  \"officerId\": \"{{officerId}}\",\n  \"notes\": \"Please handle today\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "List",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const list = pm.response.json();",
+                  "if (list.length) pm.collectionVariables.set('categoryId', list[0].id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/categories" }
+        },
+        {
+          "name": "Create (admin)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/categories",
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Elevators\",\n  \"description\": \"Lift faults\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users (admin)",
+      "item": [
+        {
+          "name": "List",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/users?page=1&pageSize=10" }
+        },
+        {
+          "name": "Officers",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const list = pm.response.json();",
+                  "if (list.length) pm.collectionVariables.set('officerId', list[0].id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/users/officers" }
+        },
+        {
+          "name": "Create officer",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/users",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Mike\",\n  \"lastName\": \"Fixer\",\n  \"email\": \"mike@staff.edu\",\n  \"password\": \"Pass@123\",\n  \"role\": \"Officer\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reports (admin)",
+      "item": [
+        { "name": "Summary", "request": { "method": "GET", "url": "{{baseUrl}}/api/reports/summary" } }
+      ]
+    }
+  ]
+}
