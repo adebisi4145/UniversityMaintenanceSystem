@@ -1,5 +1,8 @@
 # University Maintenance System
 
+**Live demo:** [university-maintenance-system-z45k.vercel.app](https://university-maintenance-system-z45k.vercel.app) ·
+**API/Swagger:** [university-maintenance-api.onrender.com/swagger](https://university-maintenance-api.onrender.com/swagger)
+
 A full-stack web application that replaces manual maintenance complaints (phone, paper, WhatsApp,
 office visits) with a digital service desk. Students and staff submit and track service requests;
 maintenance officers work assigned jobs and update progress; administrators manage users, assign

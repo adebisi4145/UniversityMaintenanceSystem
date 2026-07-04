@@ -160,8 +160,17 @@ npm test           → 7 passed (7)
 
 ## 10. Deployment information
 
+**Live URLs:**
+
+| Component | URL |
+|---|---|
+| Frontend (Vercel) | https://university-maintenance-system-z45k.vercel.app |
+| API + Swagger (Render) | https://university-maintenance-api.onrender.com/swagger |
+| Database | PostgreSQL on Neon (US East) |
+
 Three-tier deployment (all free-tier capable): **PostgreSQL on Neon**, **API on Render** (Docker), and
-the **React SPA on Vercel**. The repo ships a `Dockerfile`, a `render.yaml` blueprint, `vercel.json`
+the **React SPA on Vercel**. The deployed stack was verified end-to-end in a real browser (register,
+login, submit, assign, status updates, audit trail) with zero errors. The repo ships a `Dockerfile`, a `render.yaml` blueprint, `vercel.json`
 (SPA rewrites), and `docker-compose.yml` for local Postgres. The API reads its connection string, JWT
 secret, and allowed CORS origin from environment variables, applies EF Core migrations, and seeds
 roles, categories, and the default admin on startup. Full steps are in
